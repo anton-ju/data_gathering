@@ -15,7 +15,7 @@ class Scrapper(object):
         # from any API, or iterate throught pages of any site
         # Do not forget to skip already gathered data
         # Here is an example for you
-        url = 'https://otus.ru/'
+        url = 'https://www.avito.ru/sankt-peterburg/avtomobili/bmw'
         response = requests.get(url)
 
         if not response.ok:
