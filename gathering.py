@@ -127,7 +127,7 @@ import sys
 
 from scrappers.scrapper import Scrapper
 from storages.file_storage import FileStorage
-
+from parsers.html_parser import HtmlParser
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -150,6 +150,13 @@ def convert_data_to_table_format():
 
     # Your code here
     # transform gathered data from txt file to pandas DataFrame and save as csv
+    
+    storage = FileStorage(SCRAPPED_FILE)
+    data = storage.read_data()
+    fields = ["items-descriprion-title-link"]
+    parser = HtmlParser(fields)
+    data_list = parser.parse(data)
+    print(data_list)
     pass
 
 

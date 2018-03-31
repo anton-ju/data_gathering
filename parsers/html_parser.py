@@ -15,7 +15,8 @@ class HtmlParser(Parser):
         soup = BeautifulSoup(data)
 
         # Your code here: find an appropriate html element
-        objects_list = soup.find('div', {'class': 'itemsList'})
-
+        objects_list = soup.find_all(attrs=
+                                     {'class': 'items-descriprion-title-link'})
+        print(objects_list)
         # Your code here
-        return [dict()]
+        return objects_list
