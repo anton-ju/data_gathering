@@ -1,7 +1,12 @@
+import logging
 from parsers.parser import Parser
 
-from bs4 import BeautifulSoup  # You can use any other library
+logger = logging.getLogger(__name__)
+fh = logging.FileHandler('data_gathering1.log')
+fh.setLevel(logging.INFO)
 
+from bs4 import BeautifulSoup  # You can use any other library
+import re
 
 class HtmlParser(Parser):
 
@@ -12,11 +17,58 @@ class HtmlParser(Parser):
         :return: a dictionary where key is one
         of defined fields and value is this field's value
         """
-        soup = BeautifulSoup(data)
-
-        # Your code here: find an appropriate html element
-        objects_list = soup.find_all(attrs=
-                                     {'class': 'items-descriprion-title-link'})
-        print(objects_list)
-        # Your code here
-        return objects_list
+        soup = BeautifulSoup(data, "lxml")
+        
+        table1 = soup.find_all(attrs={'class':'item-description-title-link'})
+        table2 = soup.find_all(attrs={'class':'about'})
+        
+        item_list = []
+        pattern = '(^.*?),\s?(\d{4})\s*(.*)руб.\s*(.*)км.*(\d\.\d).*(AT|MT).*\((\d*).*?(\w+),\s+?(\w+),\s+?(\w+)\s+?'
+        
+        
+        li1 = [_.text for _ in table1]
+        li2 = [_.text for _ in table2]
+        
+        for i in range(len(li1)):
+            broken= False
+            if li2[i].find('Битый') :
+                broken = True
+                li2[i] = li2[i].replace('Битый,', '')
+            
+            str_to_parse= li1[i]+li2[i]
+            
+            result = re.findall(pattern, str_to_parse, re.DOTALL)
+            
+#            logger.info(type(result))
+            if result :
+                result = list(result[0] + tuple([broken.__str__()]))
+#                logger.info(result)
+                res_dict = dict(
+                            model = result[0],
+                            year= result[1],
+                            prise= result[2],
+                            distance= result[3],
+                            volume= result[4],
+                            transmission= result[5],
+                            power= result[6],
+                            carcase= result[7],
+                            drive_unit= result[8],
+                            fuel= result[9],
+                            broken= result[10])
+                
+#                res_dict = dict.fromkeys(['model', 
+#                                      'year', 
+#                                      'prise', 
+#                                      'distance', 
+#                                      'volume', 
+#                                      'transmission',
+#                                      'power',
+#                                      'carcase',
+#                                      'drive_unit',
+#                                      'fuel',
+#                                      'broken'], result)  
+    
+#                logger.info(res_dict)
+                item_list.append(res_dict)
+        
+        return item_list

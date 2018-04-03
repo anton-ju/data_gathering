@@ -1,32 +1,4 @@
 """
-Зачем нужны __init__.py файлы
-https://stackoverflow.com/questions/448271/what-is-init-py-for
-
-Про документирование в Python проекте
-https://www.python.org/dev/peps/pep-0257/
-
-Про оформление Python кода
-https://www.python.org/dev/peps/pep-0008/
-
-
-Примеры сбора данных:
-https://habrahabr.ru/post/280238/
-
-Для запуска тестов в корне проекта:
-python3 -m unittest discover
-
-Для запуска проекта из корня проекта:
-python3 -m gathering gather
-или
-python3 -m gathering transform
-или
-python3 -m gathering stats
-
-
-Для проверки стиля кода всех файлов проекта из корня проекта
-pep8 .
-
-
 ЗАДАНИЕ
 
 Выбрать источник данных и собрать данные по некоторой предметной области.
@@ -64,7 +36,7 @@ pep8 .
 - Пользователи vk.com (API)
 - Посты любой популярной группы vk.com (API)
 - Фильмы с Кинопоиска
-(см. ссылку на статью выше)
+(см. ссылку на статью ниже)
 - Отзывы с Кинопоиска
 - Статьи Википедии
 (довольно сложная задача,
@@ -119,6 +91,33 @@ pep8 .
 Код можно менять любым удобным образом
 Можно использовать и Python 2.7, и 3
 
+Зачем нужны __init__.py файлы
+https://stackoverflow.com/questions/448271/what-is-init-py-for
+
+Про документирование в Python проекте
+https://www.python.org/dev/peps/pep-0257/
+
+Про оформление Python кода
+https://www.python.org/dev/peps/pep-0008/
+
+
+Примеры сбора данных:
+https://habrahabr.ru/post/280238/
+
+Для запуска тестов в корне проекта:
+python3 -m unittest discover
+
+Для запуска проекта из корня проекта:
+python3 -m gathering gather
+или
+python3 -m gathering transform
+или
+python3 -m gathering stats
+
+
+Для проверки стиля кода всех файлов проекта из корня проекта
+pep8 .
+
 """
 
 import logging
@@ -128,9 +127,14 @@ import sys
 from scrappers.scrapper import Scrapper
 from storages.file_storage import FileStorage
 from parsers.html_parser import HtmlParser
+import numpy as np
+import pandas as pd
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
+fh = logging.FileHandler('data_gathering.log')
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
 
 SCRAPPED_FILE = 'scrapped_data.txt'
 TABLE_FORMAT_FILE = 'data.csv'
@@ -150,16 +154,18 @@ def convert_data_to_table_format():
 
     # Your code here
     # transform gathered data from txt file to pandas DataFrame and save as csv
-    
     storage = FileStorage(SCRAPPED_FILE)
-    data = storage.read_data()
-    fields = ["items-descriprion-title-link"]
-    parser = HtmlParser(fields)
-    data_list = parser.parse(data)
-    print(data_list)
-    pass
-
-
+    data = ''.join(storage.read_data())
+ 
+    parser = HtmlParser(['fields'])
+    result = parser.parse(data)
+    
+    df = pd.DataFrame(data=result)
+    df.to_csv('data.csv', encoding='cp1251')
+    logger.info('data saved to csv')
+#    for _ in result: logger.info(_)
+    
+    
 def stats_of_data():
     logger.info("stats")
 
@@ -167,8 +173,11 @@ def stats_of_data():
     # Load pandas DataFrame and print to stdout different statistics about the data.
     # Try to think about the data and use not only describe and info.
     # Ask yourself what would you like to know about this data (most frequent word, or something else)
-
-
+    df = pd.read_csv('data.csv', encoding='cp1251')
+    print(df.head(10))
+    
+    
+    
 if __name__ == '__main__':
     """
     why main is so...?

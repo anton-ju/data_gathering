@@ -17,7 +17,7 @@ class Scrapper(object):
         # Here is an example for you
         url = 'https://www.avito.ru/sankt-peterburg/avtomobili/bmw'
         response = requests.get(url)
-
+#        logger.info(response.text)
         if not response.ok:
             logger.error(response.text)
             # then continue process, or retry, or fix your code
@@ -25,7 +25,8 @@ class Scrapper(object):
         else:
             # Note: here json can be used as response.json
             data = response.text
-
+#            data = str(data.encode('utf8'))
+#            logger.info(type(data))
             # save scrapped objects here
             # you can save url to identify already scrapped objects
             storage.write_data([url + '\t' + data.replace('\n', '')])
