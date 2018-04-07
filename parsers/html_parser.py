@@ -2,8 +2,6 @@ import logging
 from parsers.parser import Parser
 
 logger = logging.getLogger(__name__)
-fh = logging.FileHandler('data_gathering1.log')
-fh.setLevel(logging.INFO)
 
 from bs4 import BeautifulSoup  # You can use any other library
 import re
