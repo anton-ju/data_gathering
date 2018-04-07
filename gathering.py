@@ -139,6 +139,17 @@ logger.addHandler(fh)
 SCRAPPED_FILE = 'scrapped_data.txt'
 TABLE_FORMAT_FILE = 'data.csv'
 
+FIELDS = ['broken',
+          'carcase',
+          'distance',
+          'drive_unit',
+          'fuel',
+          'model',
+          'power',
+          'price',
+          'transmission',
+          'volume',
+          'year']
 
 def gather_process():
     logger.info("gather")
@@ -157,13 +168,13 @@ def convert_data_to_table_format():
     storage = FileStorage(SCRAPPED_FILE)
     data = ''.join(storage.read_data())
  
-    parser = HtmlParser(['fields'])
+    parser = HtmlParser(FIELDS)
     result = parser.parse(data)
-    
+
     df = pd.DataFrame(data=result)
-    df.to_csv('data.csv', encoding='cp1251')
+    df.to_csv('data.csv', encoding='cp1251', columns= FIELDS, index=False)
     logger.info('data saved to csv')
-#    for _ in result: logger.info(_)
+
     
     
 def stats_of_data():
@@ -173,10 +184,25 @@ def stats_of_data():
     # Load pandas DataFrame and print to stdout different statistics about the data.
     # Try to think about the data and use not only describe and info.
     # Ask yourself what would you like to know about this data (most frequent word, or something else)
-    df = pd.read_csv('data.csv', encoding='cp1251')
-    print(df.head(10))
+    df = pd.read_csv('data.csv', encoding='cp1251')#, names= FIELDS)
     
+    pd.set_option('display.precision',2)
+    pd.options.display.float_format = '{:10,.2f}'.format
+    print(df.describe())
+    grouped = df.groupby(['model'])
+    top4models = grouped.count().sort_values(by=['price'], ascending=False).loc[:,'price'][:4]
+    print(top4models)
+
     
+    avg_dist_by_year = df.groupby(['year']).mean().loc[:,'distance']
+    print(avg_dist_by_year)
+    
+    avg_model_year_price = df.groupby(['model', 'year']).mean().loc[:,'price']
+    print(avg_model_year_price)
+
+
+# print(grouped.mean().loc[:,'price'])
+#    print(df.info())
     
 if __name__ == '__main__':
     """

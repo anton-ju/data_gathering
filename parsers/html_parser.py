@@ -38,16 +38,15 @@ class HtmlParser(Parser):
             str_to_parse= li1[i]+li2[i]
             
             result = re.findall(pattern, str_to_parse, re.DOTALL)
-            
-#            logger.info(type(result))
+
             if result :
                 result = list(result[0] + tuple([broken.__str__()]))
-#                logger.info(result)
+              
                 res_dict = dict(
                             model = result[0],
                             year= result[1],
-                            prise= result[2],
-                            distance= result[3],
+                            price= int(str(result[2]).replace(' ','')),
+                            distance= int(str(result[3]).replace(' ','')),
                             volume= result[4],
                             transmission= result[5],
                             power= result[6],
@@ -56,19 +55,8 @@ class HtmlParser(Parser):
                             fuel= result[9],
                             broken= result[10])
                 
-#                res_dict = dict.fromkeys(['model', 
-#                                      'year', 
-#                                      'prise', 
-#                                      'distance', 
-#                                      'volume', 
-#                                      'transmission',
-#                                      'power',
-#                                      'carcase',
-#                                      'drive_unit',
-#                                      'fuel',
-#                                      'broken'], result)  
     
-#                logger.info(res_dict)
+
                 item_list.append(res_dict)
         
         return item_list
